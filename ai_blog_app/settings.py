@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,11 +85,11 @@ WSGI_APPLICATION = 'ai_blog_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ai_blog_data',
-        'USER': 'postgres',
-        'PASSWORD': 'ahmed13543',  # Replace with your actual password
-        'HOST': 'localhost',
-        'PORT': '5432',  # Default PostgreSQL port
+        'NAME': os.environ.get('DB_NAME', 'ai_blog_data'),  # Replace with your actual database name
+        'USER': os.environ.get('DB_USER', 'postgres'),  # Replace with your actual database user
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),  # Replace with your actual database password
+        'HOST': os.environ.get('DB_HOST', 'localhost'),  # Replace with your actual database host
+        'PORT': os.environ.get('DB_PORT', '5432'),  # Replace with your actual database port
     }
 }
 

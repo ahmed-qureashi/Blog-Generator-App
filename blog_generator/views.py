@@ -1,14 +1,57 @@
+import json
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render , redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from pytube import YouTube
+from django.conf import settings
+import os
+import assemblyai as aai
 # Create your views here.
 @login_required
 def index(request):
     return render(request, 'index.html')
+@csrf_exempt
 def generate_blog(request):
-    pass
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            yt_link = data.get('link')
+            return JsonResponse({'content': yt_link})
+
+        except (KeyError, json.JSONDecodeError):
+            return JsonResponse({'error': 'Invalid data'}, status=400)
+        #title
+
+        title = yt_title(yt_link)
+        #transcript
+        #summary of open ai
+        #save to database
+        #return blog article as response
+            
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+def yt_title(link):
+    yt = YouTube(link)
+    title = yt.title
+    return title
+
+def download_audio(link):
+    yt = YouTube(link)
+    video = yt.streams.filter(only_audio=True).first()
+    out_file = video.download(output_path=settings.MEDIA_ROOT)
+    base, ext = os.path.splitext(out_file)
+    new_file = base + '.mp3'
+    return new_file
+
+def get_transcription(link):
+    audio_file = download_audio(link)
+
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
